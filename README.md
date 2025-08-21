@@ -40,6 +40,46 @@ TLS_INSECURE=true          # true = curl -k (ignore cert). Set false if you have
 
 **Part 6. ** **Add script to backup**
 
+#!/usr/bin/env bash
+set -euo pipefail
+
+ENV_FILE="/home/Backup/panorama/.env"
+LOG_DIR="/home/Backup/panorama/log"
+LOG_FILE="${LOG_DIR}/backup_config.log"
+
+[[ -f "$ENV_FILE" ]] || { echo "Brak $ENV_FILE"; exit 1; }
+# shellcheck disable=SC1090
+source "$ENV_FILE"
+
+mkdir -p "$LOCAL_BACKUP_DIR" "$LOG_DIR"
+: "${PANORAMA_HOST:?}" "${PANORAMA_API_KEY:?}" "${LOCAL_BACKUP_DIR:?}" "${RETENTION_DAYS:?}" "${TLS_INSECURE:?}"
+
+CURL_INSECURE_FLAG=""
+[[ "${TLS_INSECURE,,}" == "true" ]] && CURL_INSECURE_FLAG="-k"
+
+TS="$(date +%F_%H%M%S)"
+TMP="$(mktemp "/tmp/panorama_configuration_${TS}.XXXXXX")"
+OUT="${LOCAL_BACKUP_DIR}/panorama_configuration_${TS}.xml"
+
+log(){ echo "[$(date '+%F %T')] $*" | tee -a "$LOG_FILE"; }
+
+URL="https://${PANORAMA_HOST}/api/?type=export&category=configuration&key=${PANORAMA_API_KEY}"
+log "Pobieram configuration z ${URL}"
+if ! curl -s ${CURL_INSECURE_FLAG} --fail "${URL}" -o "${TMP}"; then
+  log "BŁĄD: pobieranie configuration nie powiodło się"; rm -f "${TMP}"; exit 2
+fi
+[[ -s "$TMP" ]] || { log "BŁĄD: pusty plik configuration"; rm -f "$TMP"; exit 3; }
+if grep -aq '<response status="error"' "$TMP" 2>/dev/null; then
+  log "BŁĄD API (configuration):"; head -n 30 "$TMP" | sed 's/^/[API]/' | tee -a "$LOG_FILE"; rm -f "$TMP"; exit 4
+fi
+
+mv "$TMP" "$OUT"
+gzip -9 "$OUT"
+OUT="${OUT}.gz"
+log "Zapisano: $OUT"
+
+find "$LOCAL_BACKUP_DIR" -type f -mtime +"$RETENTION_DAYS" -name 'panorama_*' -print -delete | tee -a "$LOG_FILE" || true
+log "CONFIG backup OK."
 
 
 **Part 7. ** **Add file permissions**
@@ -61,5 +101,11 @@ chown -R super_admin:super_admin /home/Backup/panorama/log
 chmod +x /home/Backup/panorama/backup_panorama.sh
 
 **Part 9. ** **Testing manual**
+
+./backup_panorama.sh
+
+**Part 10. ** **Add to crontab**
+
+(crontab -l 2>/dev/null; echo "15 1 * * * /home/Backup/panorama/backup_panorama.sh >/dev/null 2>&1") | crontab -
 
 
