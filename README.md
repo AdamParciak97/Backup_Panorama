@@ -14,7 +14,9 @@ SERVER LINUX (for BACKUP)
 
 Run CMD and paste this command:
 
+```bash
 curl -sk "https://192.168.10.44/api/?type=keygen&user=super_admin&password=PASSWORD_FOR_THIS_ACCOUNT"
+```
 
 **Part 3. ** **Create directory on Linux server**
 
