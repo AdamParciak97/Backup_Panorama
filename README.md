@@ -84,7 +84,7 @@ fi
 mv "$TMP" "$OUT"
 gzip -9 "$OUT"
 OUT="${OUT}.gz"
-log "Zapisano: $OUT"
+log "Save: $OUT"
 
 find "$LOCAL_BACKUP_DIR" -type f -mtime +"$RETENTION_DAYS" -name 'panorama_*' -print -delete | tee -a "$LOG_FILE" || true
 log "CONFIG backup OK."
