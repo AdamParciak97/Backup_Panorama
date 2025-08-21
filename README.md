@@ -1,16 +1,16 @@
-# Backup_Panorama
+## Backup_Panorama
 Create Backup Panorama on script schedule
 
 
-**Architecture:**
+### Architecture:
 PANORAMA
 SERVER LINUX (for BACKUP)
 
-**Part 1. ** **Create ACCOUNT on PANORAMA**
+### Part 1. ** **Create ACCOUNT on PANORAMA
 
 <img width="1607" height="267" alt="image" src="https://github.com/user-attachments/assets/7982842e-0520-49cd-9110-e8c9c6955e40" />
 
-**Part 2. ** **Create API KEY for this Account** The key is valid as long as the account exists and you do not change its password.
+### Part 2. Create API KEY for this Account The key is valid as long as the account exists and you do not change its password.
 
 Run CMD and paste this command:
 
@@ -18,21 +18,21 @@ Run CMD and paste this command:
 curl -sk "https://192.168.10.44/api/?type=keygen&user=super_admin&password=PASSWORD_FOR_THIS_ACCOUNT"
 ```
 
-**Part 3. ** **Create directory on Linux server**
+### Part 3. Create directory on Linux server
 
 ```bash
 mkdir -p /home/Backup/panorama/archive
 mkdir -p /home/Backup/panorama/log
 ```
 
-**Part 4. ** **Create file to login and API-KEY**
+### Part 4. Create file to login and API-KEY
 
 ```bash
 touch /home/Backup/panorama/.env
 chmod 600 /home/Backup/panorama/.env
 ```
 
-**Part 5. ** **Modifying .env file**
+### Part 5. Modifying .env file
 
 ```bash
 # === Panorama API ===
@@ -45,7 +45,7 @@ RETENTION_DAYS=30
 TLS_INSECURE=true          # true = curl -k (ignore cert). Set false if you have correct certificate.
 ```
 
-**Part 6. ** **Add script to backup**
+### Part 6. Add script to backup
 
 ```bash
 #!/usr/bin/env bash
@@ -90,7 +90,7 @@ find "$LOCAL_BACKUP_DIR" -type f -mtime +"$RETENTION_DAYS" -name 'panorama_*' -p
 log "CONFIG backup OK."
 ```
 
-**Part 7. ** **Add file permissions**
+### Part 7. Add file permissions
 
 ```bash
 chmod 600 /home/Backup/panorama/.env
@@ -106,19 +106,19 @@ chmod 700 /home/Backup/panorama/log
 chown -R super_admin:super_admin /home/Backup/panorama/log
 ```
 
-**Part 8. ** **Add modyfing permission to script.**
+### Part 8. Add modyfing permission to script
 
 ```bash
 chmod +x /home/Backup/panorama/backup_panorama.sh
 ```
 
-**Part 9. ** **Testing manual**
+### Part 9. Testing manual
 
 ```bash
 ./backup_panorama.sh
 ```
 
-**Part 10. ** **Add to crontab**
+### Part 10. Add to crontab
 
 ```bash
 (crontab -l 2>/dev/null; echo "15 1 * * * /home/Backup/panorama/backup_panorama.sh >/dev/null 2>&1") | crontab -
