@@ -6,7 +6,7 @@ Create Backup Panorama on script schedule
 * PANORAMA
 * SERVER LINUX (for BACKUP)
 
-### Part 1. ** **Create ACCOUNT on PANORAMA
+### Part 1. Create Account on PANORAMA
 
 <img width="1607" height="267" alt="image" src="https://github.com/user-attachments/assets/7982842e-0520-49cd-9110-e8c9c6955e40" />
 
