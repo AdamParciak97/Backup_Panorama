@@ -3,8 +3,8 @@ Create Backup Panorama on script schedule
 
 
 ### Architecture:
-PANORAMA
-SERVER LINUX (for BACKUP)
+* **PANORAMA
+* **SERVER LINUX (for BACKUP)
 
 ### Part 1. ** **Create ACCOUNT on PANORAMA
 
