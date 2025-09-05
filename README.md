@@ -74,11 +74,11 @@ log(){ echo "[$(date '+%F %T')] $*" | tee -a "$LOG_FILE"; }
 URL="https://${PANORAMA_HOST}/api/?type=export&category=configuration&key=${PANORAMA_API_KEY}"
 log "Pobieram configuration z ${URL}"
 if ! curl -s ${CURL_INSECURE_FLAG} --fail "${URL}" -o "${TMP}"; then
-  log "BŁĄD: pobieranie configuration nie powiodło się"; rm -f "${TMP}"; exit 2
+  log "ERROR: Download configuration not working"; rm -f "${TMP}"; exit 2
 fi
-[[ -s "$TMP" ]] || { log "BŁĄD: pusty plik configuration"; rm -f "$TMP"; exit 3; }
+[[ -s "$TMP" ]] || { log "ERROR: empty file configuration"; rm -f "$TMP"; exit 3; }
 if grep -aq '<response status="error"' "$TMP" 2>/dev/null; then
-  log "BŁĄD API (configuration):"; head -n 30 "$TMP" | sed 's/^/[API]/' | tee -a "$LOG_FILE"; rm -f "$TMP"; exit 4
+  log "ERROR API (configuration):"; head -n 30 "$TMP" | sed 's/^/[API]/' | tee -a "$LOG_FILE"; rm -f "$TMP"; exit 4
 fi
 
 mv "$TMP" "$OUT"
