@@ -1,4 +1,4 @@
-## Backup_Panorama
+## Backup Panorama (Palo Alto)
 Create Backup Panorama on script schedule
 
 
